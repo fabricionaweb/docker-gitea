@@ -1,0 +1,36 @@
+#!/usr/bin/with-contenv sh
+
+CONFIG_FILE="/config/sshd_config"
+SSH_DIR="/config/.sshd"
+
+# create initial config file
+if [[ ! -f "$CONFIG_FILE" ]]; then
+  TMP_FILE="$(mktemp)"
+  cat <<EOF >"$TMP_FILE"
+Port 2222
+HostKey $SSH_DIR/host_rsa_key
+HostKey $SSH_DIR/host_dsa_key
+HostKey $SSH_DIR/host_ecdsa_key
+HostKey $SSH_DIR/host_ed25519_key
+PermitRootLogin no
+PasswordAuthentication no
+PermitUserEnvironment yes
+AllowUsers git
+EOF
+
+  install -m644 -o root -g root "$TMP_FILE" "$CONFIG_FILE"
+fi
+
+# create server keys
+[ ! -d "$SSH_DIR" ] && mkdir -p "$SSH_DIR"
+[ ! -f "$SSH_DIR/host_rsa_key" ]     && ssh-keygen -q -f "$SSH_DIR/host_rsa_key"     -N '' -t rsa;
+[ ! -f "$SSH_DIR/host_dsa_key" ]     && ssh-keygen -q -f "$SSH_DIR/host_dsa_key"     -N '' -t dsa;
+[ ! -f "$SSH_DIR/host_ecdsa_key" ]   && ssh-keygen -q -f "$SSH_DIR/host_ecdsa_key"   -N '' -t ecdsa;
+[ ! -f "$SSH_DIR/host_ed25519_key" ] && ssh-keygen -q -f "$SSH_DIR/host_ed25519_key" -N '' -t ed25519;
+# fix ssh permisions
+chown root:root -R "$SSH_DIR"
+chmod 0700 "$SSH_DIR"
+chmod 0600 "$SSH_DIR"/*
+
+# run sshd daemon
+exec /usr/sbin/sshd -D -e -f /config/sshd_config

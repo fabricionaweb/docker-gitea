@@ -1,0 +1,32 @@
+#!/usr/bin/with-contenv sh
+
+CONFIG_FILE="/config/app.ini"
+
+# create initial config file
+if [[ ! -f "$CONFIG_FILE" ]]; then
+  TMP_FILE="$(mktemp)"
+  cat <<EOF >"$TMP_FILE"
+[server]
+SSH_PORT = 2222
+
+[repository]
+SCRIPT_TYPE = sh
+
+[database]
+DB_TYPE = sqlite3
+
+[log]
+MODE = console, file
+
+[session]
+PROVIDER = file
+EOF
+
+  install -m644 -o $PUID -g $PGID "$TMP_FILE" "$CONFIG_FILE"
+fi
+
+# change chdir
+cd /config
+
+# run with limited permissions
+exec s6-setuidgid $PUID:$PGID /app/gitea web -c /config/app.ini
