@@ -22,7 +22,7 @@ EOF
 fi
 
 # create server keys
-[ ! -d "$SSH_DIR" ] && mkdir -p "$SSH_DIR"
+[ ! -d "$SSH_DIR" ] && mkdir -p "$SSH_DIR";
 [ ! -f "$SSH_DIR/host_rsa_key" ]     && ssh-keygen -q -f "$SSH_DIR/host_rsa_key"     -N '' -t rsa;
 [ ! -f "$SSH_DIR/host_dsa_key" ]     && ssh-keygen -q -f "$SSH_DIR/host_dsa_key"     -N '' -t dsa;
 [ ! -f "$SSH_DIR/host_ecdsa_key" ]   && ssh-keygen -q -f "$SSH_DIR/host_ecdsa_key"   -N '' -t ecdsa;
