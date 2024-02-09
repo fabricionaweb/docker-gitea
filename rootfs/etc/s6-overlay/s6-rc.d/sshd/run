@@ -18,7 +18,7 @@ PermitUserEnvironment yes
 AllowUsers git
 EOF
 
-  install -m644 -o root -g root "$TMP_FILE" "$CONFIG_FILE"
+  install -m600 -o root -g root "$TMP_FILE" "$CONFIG_FILE"
 fi
 
 # create server keys
