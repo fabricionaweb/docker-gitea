@@ -31,8 +31,6 @@ RUN npx webpack
 
 # build stage ==================================================================
 FROM base AS build-backend
-# required for go-sqlite3
-ENV CGO_ENABLED=1 CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
 
 # dependencies
 RUN apk add --no-cache build-base git && \
@@ -45,6 +43,8 @@ RUN go mod download
 # build app
 COPY --from=source /src ./
 COPY --from=build-frontend /src/public ./public
+# required for go-sqlite3
+ENV CGO_ENABLED=1 CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
 ENV TAGS="bindata sqlite sqlite_unlock_notify"
 ARG VERSION
 RUN mkdir /build && \
