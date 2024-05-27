@@ -22,7 +22,7 @@ COPY --from=source /src/package*.json ./
 RUN npm ci --fund=false --audit=false
 
 # frontend source and build
-COPY --from=source /src/webpack.config.js ./
+COPY --from=source /src/webpack.config.js /src/tailwind.config.js ./
 COPY --from=source /src/assets ./assets
 COPY --from=source /src/public ./public
 COPY --from=source /src/web_src ./web_src
