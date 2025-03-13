@@ -6,10 +6,11 @@ WORKDIR /src
 # source stage =================================================================
 FROM base AS source
 
-# get and extract source from git
+# get and extract source from git (must use only one or another build-args)
 ARG BRANCH
 ARG VERSION
-ADD https://github.com/go-gitea/gitea.git#${BRANCH:-v$VERSION} ./
+ADD https://github.com/go-gitea/gitea/archive/refs/${BRANCH:+heads/$BRANCH}${VERSION:+tags/v$VERSION}.tar.gz /tmp/source.tgz
+RUN tar --strip-components=1 -xf /tmp/source.tgz
 
 # frontend stage ===============================================================
 FROM base AS build-frontend
@@ -34,7 +35,7 @@ FROM base AS build-backend
 
 # dependencies
 RUN apk add --no-cache build-base git && \
-    apk add --no-cache go --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+    apk add --no-cache go --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
 
 # build dependencies
 COPY --from=source /src/go.mod /src/go.sum ./
